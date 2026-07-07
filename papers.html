@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Papers — ScholarStream</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Stylesheets -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    
+    <!-- Page Specific Stylesheet -->
+    <link rel="stylesheet" href="css/papers.css">
+</head>
+<body>
+    <!-- Static Navigation Header -->
+    <nav class="navbar" id="navbar">
+        <div class="container navbar-container">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-accent">Scholar</span>Stream
+            </a>
+            <div class="nav-links">
+                <a href="papers.html" class="nav-link">Browse</a>
+                <a href="bookmarks.html" class="nav-link auth-only hidden">Bookmarks</a>
+                <a href="dashboard.html" class="nav-link auth-only hidden">Dashboard</a>
+                <a href="my-papers.html" class="nav-link author-only hidden">My Papers</a>
+                <a href="upload.html" class="nav-link author-only hidden">Upload</a>
+                <a href="review.html" class="nav-link reviewer-only hidden">Review Queue</a>
+                <a href="admin.html" class="nav-link admin-only hidden">Admin Panel</a>
+            </div>
+            <form class="nav-search-form" action="search.html" method="GET">
+                <div class="search-input-wrapper">
+                    <input type="text" name="q" placeholder="Search papers..." required>
+                    <button type="submit" aria-label="Search"><i data-lucide="search"></i></button>
+                </div>
+            </form>
+            <div class="nav-actions">
+                <div class="guest-only">
+                    <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+                </div>
+                <div class="user-menu-wrapper hidden">
+                    <button class="user-menu-btn">
+                        <span class="user-avatar">U</span>
+                        <span class="user-name">User</span>
+                        <i data-lucide="chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="dropdown-header">
+                            <p class="dropdown-fullname">User Full Name</p>
+                            <p class="dropdown-email">user@example.com</p>
+                            <span class="badge badge-outline">Role</span>
+                        </div>
+                        <a href="dashboard.html" class="dropdown-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                        <a href="bookmarks.html" class="dropdown-item"><i data-lucide="bookmark"></i> Bookmarks</a>
+                        <hr>
+                        <button id="btn-logout" class="dropdown-item text-danger"><i data-lucide="log-out"></i> Logout</button>
+                    </div>
+                </div>
+                <button class="mobile-menu-toggle btn-icon" aria-label="Toggle Mobile Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main>
+        <div class="container browse-container">
+            <!-- Sidebar Filter -->
+            <aside class="filter-sidebar">
+                <div class="sidebar-header">
+                    <h3>Filter by Subject</h3>
+                </div>
+                <div class="filter-list" id="category-filter-list">
+                    <button class="filter-item active" data-category="all">All Subjects</button>
+                    <!-- Categories loaded dynamically -->
+                    <div class="spinner-wrapper flex-center mt-3" id="categories-spinner">
+                        <div class="spinner spinner-sm" style="width: 24px; height: 24px; border-width: 2px;"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Papers Grid Section -->
+            <section class="papers-content">
+                <div class="flex-between papers-header-row">
+                    <h2 id="papers-title">Approved Manuscripts</h2>
+                    <span id="papers-count" class="text-muted">Loading...</span>
+                </div>
+                
+                <div class="papers-grid mt-4" id="papers-grid">
+                    <!-- Papers loaded dynamically -->
+                    <div class="spinner-wrapper flex-center" style="grid-column: 1/-1;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Static Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-logo">
+                <span class="brand-accent">Scholar</span>Stream
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 ScholarStream. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Unified API JS Module -->
+    <script src="js/api.js"></script>
+    
+    <!-- Page Specific Inline Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const defaultCatId = utils.getQueryParam('category');
+            initPapers(defaultCatId);
+        });
+
+        async function initPapers(defaultCatId = null) {
+            await loadFilterCategories(defaultCatId);
+            
+            if (defaultCatId) {
+                loadPapersByCategory(defaultCatId);
+            } else {
+                loadAllApprovedPapers();
+            }
+        }
+
+        async function loadFilterCategories(activeCatId = null) {
+            const container = document.getElementById('category-filter-list');
+            const spinner = document.getElementById('categories-spinner');
+            if (!container) return;
+
+            try {
+                const categories = await api.getAllCategories();
+                
+                // Hide spinner
+                if (spinner) spinner.remove();
+
+                const allBtn = container.querySelector('[data-category="all"]');
+                allBtn.addEventListener('click', (e) => {
+                    setActiveFilter(e.target);
+                    loadAllApprovedPapers();
+                });
+
+                if (activeCatId === null) {
+                    allBtn.classList.add('active');
+                } else {
+                    allBtn.classList.remove('active');
+                }
+
+                categories.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-item';
+                    btn.dataset.category = cat.id;
+                    btn.textContent = cat.name;
+                    
+                    if (activeCatId && activeCatId.toString() === cat.id.toString()) {
+                        btn.classList.add('active');
+                    }
+
+                    btn.addEventListener('click', (e) => {
+                        setActiveFilter(e.target);
+                        loadPapersByCategory(cat.id);
+                    });
+
+                    container.appendChild(btn);
+                });
+
+            } catch (error) {
+                console.error('Failed to load filter categories:', error);
+                utils.showToast('Could not load categories.', 'error');
+                if (spinner) spinner.remove();
+            }
+        }
+
+        async function loadAllApprovedPapers() {
+            const grid = document.getElementById('papers-grid');
+            const countEl = document.getElementById('papers-count');
+            const titleEl = document.getElementById('papers-title');
+            
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            const loader = document.createElement('div');
+            loader.className = 'spinner-wrapper flex-center';
+            loader.style.gridColumn = '1/-1';
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            loader.appendChild(spinner);
+            grid.appendChild(loader);
+
+            countEl.textContent = 'Loading...';
+            titleEl.textContent = 'Approved Manuscripts';
+
+            try {
+                const papers = await api.getApprovedPapers();
+                renderPapersList(papers);
+            } catch (error) {
+                console.error('Failed to load papers:', error);
+                grid.innerHTML = '';
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.style.gridColumn = '1/-1';
+                const p = document.createElement('p');
+                p.textContent = 'Failed to load papers.';
+                empty.appendChild(p);
+                grid.appendChild(empty);
+                countEl.textContent = 'Error';
+            }
+        }
+
+        async function loadPapersByCategory(catId) {
+            const grid = document.getElementById('papers-grid');
+            const countEl = document.getElementById('papers-count');
+            const titleEl = document.getElementById('papers-title');
+            
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            const loader = document.createElement('div');
+            loader.className = 'spinner-wrapper flex-center';
+            loader.style.gridColumn = '1/-1';
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            loader.appendChild(spinner);
+            grid.appendChild(loader);
+
+            countEl.textContent = 'Loading...';
+
+            try {
+                const categories = await api.getAllCategories();
+                const activeCat = categories.find(c => c.id.toString() === catId.toString());
+                if (activeCat) {
+                    titleEl.textContent = `${activeCat.name} Manuscripts`;
+                }
+
+                const papers = await api.getPapersByCategory(catId);
+                const approvedPapers = papers.filter(p => p.status === 'APPROVED');
+                
+                renderPapersList(approvedPapers);
+            } catch (error) {
+                console.error('Failed to load category papers:', error);
+                grid.innerHTML = '';
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.style.gridColumn = '1/-1';
+                const p = document.createElement('p');
+                p.textContent = 'Failed to load papers in this category.';
+                empty.appendChild(p);
+                grid.appendChild(empty);
+                countEl.textContent = 'Error';
+            }
+        }
+
+        function renderPapersList(papers) {
+            const grid = document.getElementById('papers-grid');
+            const countEl = document.getElementById('papers-count');
+            
+            grid.innerHTML = '';
+
+            if (!papers || papers.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.style.gridColumn = '1/-1';
+                
+                const icon = document.createElement('i');
+                icon.setAttribute('data-lucide', 'book-open');
+                empty.appendChild(icon);
+                
+                const h3 = document.createElement('h3');
+                h3.textContent = 'No approved papers found';
+                empty.appendChild(h3);
+
+                const p = document.createElement('p');
+                p.className = 'mt-2 text-muted';
+                p.textContent = 'Be the first to upload one for this subject.';
+                empty.appendChild(p);
+
+                grid.appendChild(empty);
+
+                if (window.lucide) lucide.createIcons();
+                countEl.textContent = '0 papers';
+                return;
+            }
+
+            papers.forEach(paper => {
+                grid.appendChild(utils.createPaperCardElement(paper));
+            });
+
+            if (window.lucide) lucide.createIcons();
+            countEl.textContent = `${papers.length} paper${papers.length > 1 ? 's' : ''}`;
+        }
+
+        function setActiveFilter(targetBtn) {
+            const items = document.querySelectorAll('.filter-item');
+            items.forEach(item => item.classList.remove('active'));
+            targetBtn.classList.add('active');
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookmarks — ScholarStream</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Stylesheets -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    
+    <!-- Reuses Browse Grid CSS -->
+    <link rel="stylesheet" href="css/papers.css">
+</head>
+<body>
+    <!-- Static Navigation Header -->
+    <nav class="navbar" id="navbar">
+        <div class="container navbar-container">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-accent">Scholar</span>Stream
+            </a>
+            <div class="nav-links">
+                <a href="papers.html" class="nav-link">Browse</a>
+                <a href="bookmarks.html" class="nav-link auth-only hidden">Bookmarks</a>
+                <a href="dashboard.html" class="nav-link auth-only hidden">Dashboard</a>
+                <a href="my-papers.html" class="nav-link author-only hidden">My Papers</a>
+                <a href="upload.html" class="nav-link author-only hidden">Upload</a>
+                <a href="review.html" class="nav-link reviewer-only hidden">Review Queue</a>
+                <a href="admin.html" class="nav-link admin-only hidden">Admin Panel</a>
+            </div>
+            <form class="nav-search-form" action="search.html" method="GET">
+                <div class="search-input-wrapper">
+                    <input type="text" name="q" placeholder="Search papers..." required>
+                    <button type="submit" aria-label="Search"><i data-lucide="search"></i></button>
+                </div>
+            </form>
+            <div class="nav-actions">
+                <div class="guest-only">
+                    <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+                </div>
+                <div class="user-menu-wrapper hidden">
+                    <button class="user-menu-btn">
+                        <span class="user-avatar">U</span>
+                        <span class="user-name">User</span>
+                        <i data-lucide="chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="dropdown-header">
+                            <p class="dropdown-fullname">User Full Name</p>
+                            <p class="dropdown-email">user@example.com</p>
+                            <span class="badge badge-outline">Role</span>
+                        </div>
+                        <a href="dashboard.html" class="dropdown-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                        <a href="bookmarks.html" class="dropdown-item"><i data-lucide="bookmark"></i> Bookmarks</a>
+                        <hr>
+                        <button id="btn-logout" class="dropdown-item text-danger"><i data-lucide="log-out"></i> Logout</button>
+                    </div>
+                </div>
+                <button class="mobile-menu-toggle btn-icon" aria-label="Toggle Mobile Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main>
+        <div class="container">
+            <div class="papers-content">
+                <div class="flex-between papers-header-row">
+                    <h2>Saved Manuscripts</h2>
+                    <span id="bookmarks-count" class="text-muted">Loading...</span>
+                </div>
+                
+                <div class="papers-grid mt-4" id="bookmarks-grid">
+                    <!-- Bookmarks loaded dynamically -->
+                    <div class="spinner-wrapper flex-center" style="grid-column: 1/-1;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Static Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-logo">
+                <span class="brand-accent">Scholar</span>Stream
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 ScholarStream. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Unified API JS Module -->
+    <script src="js/api.js"></script>
+    
+    <!-- Page Specific Inline Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (guard.requireAuth()) {
+                loadBookmarks();
+            }
+        });
+
+        async function loadBookmarks() {
+            const grid = document.getElementById('bookmarks-grid');
+            const countEl = document.getElementById('bookmarks-count');
+            if (!grid) return;
+
+            const user = auth.getUser();
+            grid.innerHTML = '';
+            const loader = document.createElement('div');
+            loader.className = 'spinner-wrapper flex-center';
+            loader.style.gridColumn = '1/-1';
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            loader.appendChild(spinner);
+            grid.appendChild(loader);
+
+            countEl.textContent = 'Loading...';
+
+            try {
+                const bookmarks = await api.getBookmarks(user.id);
+                grid.innerHTML = '';
+
+                if (!bookmarks || bookmarks.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'empty-state';
+                    empty.style.gridColumn = '1/-1';
+                    
+                    const icon = document.createElement('i');
+                    icon.setAttribute('data-lucide', 'bookmark');
+                    empty.appendChild(icon);
+
+                    const h3 = document.createElement('h3');
+                    h3.textContent = 'No saved manuscripts';
+                    empty.appendChild(h3);
+
+                    const p = document.createElement('p');
+                    p.className = 'mt-2 text-muted';
+                    p.textContent = 'You can save papers from their detail views to read later.';
+                    empty.appendChild(p);
+
+                    const browseBtn = document.createElement('a');
+                    browseBtn.href = 'papers.html';
+                    browseBtn.className = 'btn btn-primary mt-3';
+                    browseBtn.textContent = 'Browse Papers';
+                    empty.appendChild(browseBtn);
+
+                    grid.appendChild(empty);
+                    
+                    if (window.lucide) lucide.createIcons();
+                    countEl.textContent = '0 bookmarks';
+                    return;
+                }
+
+                bookmarks.forEach(bookmark => {
+                    const paper = bookmark.paper;
+                    if (!paper) return;
+                    
+                    const authorName = paper.author ? paper.author.fullName : 'Unknown Author';
+                    const categoryName = paper.category ? paper.category.name : 'Uncategorized';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card paper-card';
+
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'card-header';
+                    
+                    const badge = utils.createStatusBadgeElement(paper.status);
+                    cardHeader.appendChild(badge);
+
+                    const categorySpan = document.createElement('span');
+                    categorySpan.className = 'paper-category';
+                    categorySpan.textContent = categoryName;
+                    cardHeader.appendChild(categorySpan);
+                    card.appendChild(cardHeader);
+
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+
+                    const title = document.createElement('h3');
+                    title.className = 'paper-title';
+                    title.textContent = paper.title;
+                    cardBody.appendChild(title);
+
+                    const author = document.createElement('p');
+                    author.className = 'paper-author';
+                    author.textContent = `By ${authorName}`;
+                    cardBody.appendChild(author);
+
+                    const abstract = document.createElement('p');
+                    abstract.className = 'paper-abstract';
+                    abstract.textContent = utils.truncateText(paper.abstractText, 150);
+                    cardBody.appendChild(abstract);
+                    card.appendChild(cardBody);
+
+                    const cardFooter = document.createElement('div');
+                    cardFooter.className = 'card-footer';
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'btn btn-danger btn-sm btn-remove-bookmark';
+                    removeBtn.dataset.bookmarkId = bookmark.id;
+                    
+                    const trash = document.createElement('i');
+                    trash.setAttribute('data-lucide', 'trash-2');
+                    removeBtn.appendChild(trash);
+                    
+                    const removeText = document.createTextNode(' Remove');
+                    removeBtn.appendChild(removeText);
+                    
+                    removeBtn.addEventListener('click', async (e) => {
+                        const bId = e.currentTarget.dataset.bookmarkId;
+                        e.currentTarget.disabled = true;
+                        try {
+                            await api.removeBookmark(bId);
+                            utils.showToast('Bookmark removed.', 'success');
+                            loadBookmarks();
+                        } catch (error) {
+                            console.error('Failed to remove bookmark:', error);
+                            utils.showToast('Failed to remove bookmark.', 'error');
+                            e.currentTarget.disabled = false;
+                        }
+                    });
+                    cardFooter.appendChild(removeBtn);
+
+                    const readBtn = document.createElement('a');
+                    readBtn.href = `paper-detail.html?id=${paper.id}`;
+                    readBtn.className = 'btn btn-outline btn-sm';
+                    readBtn.textContent = 'Read Details';
+                    cardFooter.appendChild(readBtn);
+                    card.appendChild(cardFooter);
+
+                    grid.appendChild(card);
+                });
+
+                if (window.lucide) lucide.createIcons();
+                countEl.textContent = `${bookmarks.length} bookmark${bookmarks.length > 1 ? 's' : ''}`;
+
+            } catch (error) {
+                console.error('Failed to load bookmarks:', error);
+                grid.innerHTML = '';
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.style.gridColumn = '1/-1';
+                const p = document.createElement('p');
+                p.textContent = 'Failed to load bookmarks.';
+                empty.appendChild(p);
+                grid.appendChild(empty);
+                countEl.textContent = 'Error';
+            }
+        }
+    </script>
+</body>
+</html>
+

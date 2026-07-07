@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Details — ScholarStream</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Shared Stylesheets -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+
+    <!-- Page Specific Stylesheet -->
+    <link rel="stylesheet" href="css/paper-detail.css">
+</head>
+
+<body>
+    <!-- Static Navigation Header -->
+    <nav class="navbar" id="navbar">
+        <div class="container navbar-container">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-accent">Scholar</span>Stream
+            </a>
+            <div class="nav-links">
+                <a href="papers.html" class="nav-link">Browse</a>
+                <a href="bookmarks.html" class="nav-link auth-only hidden">Bookmarks</a>
+                <a href="dashboard.html" class="nav-link auth-only hidden">Dashboard</a>
+                <a href="my-papers.html" class="nav-link author-only hidden">My Papers</a>
+                <a href="upload.html" class="nav-link author-only hidden">Upload</a>
+                <a href="review.html" class="nav-link reviewer-only hidden">Review Queue</a>
+                <a href="admin.html" class="nav-link admin-only hidden">Admin Panel</a>
+            </div>
+            <form class="nav-search-form" action="search.html" method="GET">
+                <div class="search-input-wrapper">
+                    <input type="text" name="q" placeholder="Search papers..." required>
+                    <button type="submit" aria-label="Search"><i data-lucide="search"></i></button>
+                </div>
+            </form>
+            <div class="nav-actions">
+                <div class="guest-only">
+                    <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+                </div>
+                <div class="user-menu-wrapper hidden">
+                    <button class="user-menu-btn">
+                        <span class="user-avatar">U</span>
+                        <span class="user-name">User</span>
+                        <i data-lucide="chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="dropdown-header">
+                            <p class="dropdown-fullname">User Full Name</p>
+                            <p class="dropdown-email">user@example.com</p>
+                            <span class="badge badge-outline">Role</span>
+                        </div>
+                        <a href="dashboard.html" class="dropdown-item"><i data-lucide="layout-dashboard"></i>
+                            Dashboard</a>
+                        <a href="bookmarks.html" class="dropdown-item"><i data-lucide="bookmark"></i> Bookmarks</a>
+                        <hr>
+                        <button id="btn-logout" class="dropdown-item text-danger"><i data-lucide="log-out"></i>
+                            Logout</button>
+                    </div>
+                </div>
+                <button class="mobile-menu-toggle btn-icon" aria-label="Toggle Mobile Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main>
+        <div class="container detail-container">
+            <div id="loading-details" class="spinner-wrapper flex-center" style="grid-column: 1/-1; min-height: 300px;">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="error-details" class="empty-state hidden" style="grid-column: 1/-1;">
+                <i data-lucide="alert-triangle"></i>
+                <h3 id="error-message-text">Failed to load paper details.</h3>
+                <a href="papers.html" class="btn btn-primary mt-3">Back to Browse</a>
+            </div>
+
+            <!-- Page Details Layout (hidden initially) -->
+            <div id="paper-detail-content" class="detail-grid hidden">
+                <!-- Left Column: Details & Comments -->
+                <div class="detail-main-col">
+                    <div class="card detail-card">
+                        <div class="detail-header-row">
+                            <span id="detail-category" class="paper-category">-</span>
+                            <span id="detail-status" class="badge badge-outline">-</span>
+                        </div>
+                        <h1 id="detail-title" class="detail-title">-</h1>
+                        <p class="detail-author-row">Submitted by <strong id="detail-author">-</strong> on <span
+                                id="detail-date">-</span></p>
+
+                        <div class="detail-body-section">
+                            <h3>Abstract</h3>
+                            <p id="detail-abstract" class="detail-abstract">-</p>
+                        </div>
+
+                        <div class="detail-meta-list">
+                            <div class="meta-item" id="meta-journal-row">
+                                <strong>Journal:</strong> <span id="detail-journal">-</span>
+                            </div>
+                            <div class="meta-item" id="meta-year-row">
+                                <strong>Publication Year:</strong> <span id="detail-year">-</span>
+                            </div>
+                            <div class="meta-item">
+                                <strong>Document Version:</strong> <span id="detail-version">-</span>
+                            </div>
+                            <div class="meta-item" id="meta-keywords-row">
+                                <strong>Keywords:</strong> <span id="detail-keywords">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-actions">
+                            <button id="btn-download" class="btn btn-primary">
+                                <i data-lucide="download"></i> Download Manuscript
+                            </button>
+                            <button id="btn-bookmark" class="btn btn-outline">
+                                <i data-lucide="bookmark" id="bookmark-icon"></i> <span id="bookmark-text">Save to
+                                    Bookmarks</span>
+                            </button>
+                            <button id="btn-citation" class="btn btn-outline">
+                                <i data-lucide="copy"></i> Copy Citation
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Discussion Section -->
+                    <div class="card comments-card mt-4">
+                        <div class="comments-header">
+                            <h3>Discussion Thread (<span id="comments-count">0</span>)</h3>
+                        </div>
+
+                        <!-- Discussion Inputs -->
+                        <div class="comment-input-area" id="comment-form-container">
+                            <form id="comment-form">
+                                <textarea id="comment-textarea" placeholder="Add a public comment or question..."
+                                    class="form-textarea" required></textarea>
+                                <div class="flex-end mt-2">
+                                    <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="alert alert-info hidden" id="comment-auth-alert">
+                            <p>You must <a href="login.html">sign in</a> to participate in the discussion.</p>
+                        </div>
+
+                        <!-- Comment list -->
+                        <div class="comment-list" id="comment-list-container">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: PDF Preview -->
+                <div class="detail-side-col">
+                    <div class="card pdf-preview-card">
+                        <div class="card-header">
+                            <h3>Document Preview</h3>
+                        </div>
+                        <div class="pdf-viewer-container" id="pdf-viewer-container">
+                            <!-- iframe loaded dynamically -->
+                            <div class="empty-state">
+                                <i data-lucide="file-text"></i>
+                                <p>No preview document uploaded.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Static Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-logo">
+                <span class="brand-accent">Scholar</span>Stream
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 ScholarStream. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Unified API JS Module -->
+    <script src="js/api.js"></script>
+
+    <!-- Page Specific Inline Logic -->
+    <script>
+        let currentPaper = null;
+        let bookmarksList = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const paperId = utils.getQueryParam('id');
+            if (paperId) {
+                initPaperDetails(paperId);
+            } else {
+                showErrorState('No paper ID provided.');
+            }
+        });
+
+        async function initPaperDetails(id) {
+            const spinner = document.getElementById('loading-details');
+            const content = document.getElementById('paper-detail-content');
+
+            try {
+                currentPaper = await api.getPaperById(id);
+
+                if (auth.isLoggedIn()) {
+                    try {
+                        const user = auth.getUser();
+                        bookmarksList = await api.getBookmarks(user.id);
+                    } catch (err) {
+                        console.error('Failed to pre-fetch user bookmarks:', err);
+                    }
+                }
+
+                renderDetails(currentPaper);
+                loadComments(id);
+                setupActionListeners(id);
+
+                spinner.classList.add('hidden');
+                content.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Failed to initialize paper details:', error);
+                spinner.classList.add('hidden');
+                showErrorState(error.message || 'Paper not found or connection failed.');
+            }
+        }
+
+        function renderDetails(paper) {
+            document.getElementById('detail-title').textContent = paper.title;
+            document.getElementById('detail-author').textContent = paper.author ? paper.author.fullName : 'Unknown';
+            document.getElementById('detail-date').textContent = utils.formatDate(paper.uploadDate);
+            document.getElementById('detail-abstract').textContent = paper.abstractText;
+            document.getElementById('detail-version').textContent = paper.version || '1.0';
+            document.getElementById('detail-category').textContent = paper.category ? paper.category.name : 'Uncategorized';
+
+            const statusContainer = document.getElementById('detail-status');
+            statusContainer.innerHTML = '';
+            statusContainer.appendChild(utils.createStatusBadgeElement(paper.status));
+
+            const journalRow = document.getElementById('meta-journal-row');
+            if (paper.journal) {
+                document.getElementById('detail-journal').textContent = paper.journal;
+                journalRow.classList.remove('hidden');
+            } else {
+                journalRow.classList.add('hidden');
+            }
+
+            const yearRow = document.getElementById('meta-year-row');
+            if (paper.publicationYear) {
+                document.getElementById('detail-year').textContent = paper.publicationYear;
+                yearRow.classList.remove('hidden');
+            } else {
+                yearRow.classList.add('hidden');
+            }
+
+            const keywordsRow = document.getElementById('meta-keywords-row');
+            if (paper.keywords) {
+                document.getElementById('detail-keywords').textContent = paper.keywords;
+                keywordsRow.classList.remove('hidden');
+            } else {
+                keywordsRow.classList.add('hidden');
+            }
+
+            const viewerContainer = document.getElementById('pdf-viewer-container');
+            if (paper.fileUrl) {
+                viewerContainer.innerHTML = '';
+                const iframe = document.createElement('iframe');
+                iframe.className = 'pdf-iframe';
+                iframe.src = `https://scholarstream-backend-04yg.onrender.com/uploads/papers/${paper.fileUrl}`;
+                viewerContainer.appendChild(iframe);
+            } else {
+                viewerContainer.innerHTML = '';
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                const icon = document.createElement('i');
+                icon.setAttribute('data-lucide', 'file-text');
+                empty.appendChild(icon);
+                const p = document.createElement('p');
+                p.textContent = 'No preview document uploaded.';
+                empty.appendChild(p);
+                viewerContainer.appendChild(empty);
+                if (window.lucide) lucide.createIcons();
+            }
+
+            const isSaved = bookmarksList.some(b => b.paper && b.paper.id.toString() === paper.id.toString());
+            updateBookmarkButtonUI(isSaved);
+        }
+
+        async function loadComments(paperId) {
+            const listContainer = document.getElementById('comment-list-container');
+            const countEl = document.getElementById('comments-count');
+            const formContainer = document.getElementById('comment-form-container');
+            const authAlert = document.getElementById('comment-auth-alert');
+
+            if (auth.isLoggedIn()) {
+                formContainer.classList.remove('hidden');
+                authAlert.classList.add('hidden');
+            } else {
+                formContainer.classList.add('hidden');
+                authAlert.classList.remove('hidden');
+            }
+
+            try {
+                const comments = await api.getComments(paperId);
+                countEl.textContent = comments.length;
+                listContainer.innerHTML = '';
+
+                if (!comments || comments.length === 0) {
+                    const emptyP = document.createElement('p');
+                    emptyP.className = 'text-muted text-center py-4';
+                    emptyP.textContent = 'No comments posted yet. Be the first to start the discussion!';
+                    listContainer.appendChild(emptyP);
+                    return;
+                }
+
+                const currentUser = auth.getUser();
+
+                comments.forEach(comment => {
+                    const commenterName = comment.user ? comment.user.username : 'Anonymous';
+                    const commenterFull = comment.user ? comment.user.fullName : 'Anonymous Scholar';
+                    const initials = commenterName.charAt(0).toUpperCase();
+
+                    const commentNode = document.createElement('div');
+                    commentNode.className = 'comment-node';
+
+                    const avatar = document.createElement('span');
+                    avatar.className = 'comment-avatar';
+                    avatar.title = commenterFull;
+                    avatar.textContent = initials;
+                    commentNode.appendChild(avatar);
+
+                    const main = document.createElement('div');
+                    main.className = 'comment-main';
+
+                    const meta = document.createElement('div');
+                    meta.className = 'comment-meta';
+
+                    const userSpan = document.createElement('span');
+                    userSpan.className = 'comment-user';
+                    userSpan.textContent = commenterName;
+                    meta.appendChild(userSpan);
+
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'comment-time';
+                    timeSpan.textContent = utils.timeAgo(comment.createdAt);
+                    meta.appendChild(timeSpan);
+                    main.appendChild(meta);
+
+                    const content = document.createElement('div');
+                    content.className = 'comment-content';
+                    content.textContent = comment.content;
+                    main.appendChild(content);
+
+                    if (currentUser && (comment.user.id.toString() === currentUser.id.toString() || currentUser.roles.includes('ROLE_ADMIN'))) {
+                        const actions = document.createElement('div');
+                        actions.className = 'comment-actions';
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn-comment-delete';
+                        deleteBtn.dataset.commentId = comment.id;
+
+                        const trash = document.createElement('i');
+                        trash.setAttribute('data-lucide', 'trash-2');
+                        deleteBtn.appendChild(trash);
+
+                        const delText = document.createTextNode(' Delete');
+                        deleteBtn.appendChild(delText);
+
+                        // Delete click listener
+                        deleteBtn.addEventListener('click', async (e) => {
+                            const cId = e.currentTarget.dataset.commentId;
+                            if (!confirm('Are you sure you want to delete this comment?')) return;
+
+                            e.currentTarget.disabled = true;
+                            try {
+                                await api.deleteComment(cId);
+                                utils.showToast('Comment deleted.', 'success');
+                                loadComments(paperId);
+                            } catch (error) {
+                                console.error('Failed to delete comment:', error);
+                                utils.showToast('Failed to delete comment.', 'error');
+                                e.currentTarget.disabled = false;
+                            }
+                        });
+
+                        actions.appendChild(deleteBtn);
+                        main.appendChild(actions);
+                    }
+
+                    commentNode.appendChild(main);
+                    listContainer.appendChild(commentNode);
+                });
+
+                if (window.lucide) lucide.createIcons();
+
+            } catch (error) {
+                console.error('Failed to load comments:', error);
+                listContainer.innerHTML = '';
+                const errP = document.createElement('p');
+                errP.className = 'text-danger text-center';
+                errP.textContent = 'Failed to load conversation thread.';
+                listContainer.appendChild(errP);
+            }
+        }
+
+        function setupActionListeners(paperId) {
+            document.getElementById('btn-download').addEventListener('click', () => {
+                if (!currentPaper) return;
+                api.downloadPaper(paperId, currentPaper.title);
+                utils.showToast('Download initiated...', 'success');
+            });
+
+            document.getElementById('btn-bookmark').addEventListener('click', async (e) => {
+                if (!auth.isLoggedIn()) {
+                    utils.showToast('You must login to bookmark papers.', 'error');
+                    return;
+                }
+
+                const user = auth.getUser();
+                const isSaved = bookmarksList.some(b => b.paper && b.paper.id.toString() === paperId.toString());
+
+                e.currentTarget.disabled = true;
+
+                try {
+                    if (isSaved) {
+                        const bookmarkEntry = bookmarksList.find(b => b.paper && b.paper.id.toString() === paperId.toString());
+                        if (bookmarkEntry) {
+                            await api.removeBookmark(bookmarkEntry.id);
+                            utils.showToast('Removed from Bookmarks.', 'success');
+                            bookmarksList = bookmarksList.filter(b => b.id !== bookmarkEntry.id);
+                            updateBookmarkButtonUI(false);
+                        }
+                    } else {
+                        await api.addBookmark(paperId, user.id);
+                        utils.showToast('Saved to Bookmarks.', 'success');
+                        bookmarksList = await api.getBookmarks(user.id);
+                        updateBookmarkButtonUI(true);
+                    }
+                } catch (error) {
+                    console.error('Bookmark toggle failed:', error);
+                    utils.showToast(error.message || 'Bookmark action failed.', 'error');
+                } finally {
+                    e.currentTarget.disabled = false;
+                }
+            });
+
+            document.getElementById('btn-citation').addEventListener('click', () => {
+                if (!currentPaper) return;
+                const author = currentPaper.author ? currentPaper.author.fullName : 'Unknown';
+                const year = currentPaper.publicationYear || new Date(currentPaper.uploadDate).getFullYear();
+                const journal = currentPaper.journal ? `, ${currentPaper.journal}` : '';
+                const citation = `${author} (${year}). "${currentPaper.title}"${journal}. ScholarStream Repository.`;
+
+                navigator.clipboard.writeText(citation)
+                    .then(() => utils.showToast('Citation copied to clipboard!', 'success'))
+                    .catch(() => utils.showToast('Failed to copy citation.', 'error'));
+            });
+
+            const commentForm = document.getElementById('comment-form');
+            if (commentForm) {
+                commentForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const textarea = document.getElementById('comment-textarea');
+                    const content = textarea.value.trim();
+                    const user = auth.getUser();
+
+                    if (!content) return;
+
+                    const submitBtn = commentForm.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+
+                    try {
+                        await api.addComment(content, user.id, paperId);
+                        utils.showToast('Comment added.', 'success');
+                        textarea.value = '';
+                        loadComments(paperId);
+                    } catch (error) {
+                        console.error('Failed to add comment:', error);
+                        utils.showToast('Failed to post comment.', 'error');
+                    } finally {
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+        }
+
+        function updateBookmarkButtonUI(isBookmarked) {
+            const icon = document.getElementById('bookmark-icon');
+            const text = document.getElementById('bookmark-text');
+            const btn = document.getElementById('btn-bookmark');
+
+            if (isBookmarked) {
+                btn.className = 'btn btn-primary';
+                text.textContent = 'Saved!';
+                icon.setAttribute('data-lucide', 'check');
+            } else {
+                btn.className = 'btn btn-outline';
+                text.textContent = 'Save to Bookmarks';
+                icon.setAttribute('data-lucide', 'bookmark');
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function showErrorState(message) {
+            const errorEl = document.getElementById('error-details');
+            const textEl = document.getElementById('error-message-text');
+
+            textEl.textContent = message;
+            errorEl.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+
+</html>

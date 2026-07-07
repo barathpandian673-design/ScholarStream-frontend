@@ -1,0 +1,64 @@
+/* ===================================================================
+   ScholarStream - Review Queue Styles (Minimalist)
+   =================================================================== */
+
+.review-queue-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.review-card {
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-lg);
+    background-color: var(--color-bg-surface);
+}
+
+.review-card-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: var(--color-bg-muted);
+}
+
+.review-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-main);
+}
+
+.review-meta {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.review-abstract {
+    padding: var(--spacing-md);
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+.review-actions-area {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-surface);
+}
+
+.review-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.review-form .form-input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.review-rating-input {
+    width: 80px;
+}

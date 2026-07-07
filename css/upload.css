@@ -1,0 +1,73 @@
+/* ===================================================================
+   ScholarStream - Upload Styles (Minimalist)
+   =================================================================== */
+
+.upload-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-surface);
+}
+
+.upload-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.upload-title {
+    font-size: 1.75rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.upload-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.file-upload-zone {
+    border: 2px dashed var(--color-border);
+    padding: var(--spacing-xl);
+    text-align: center;
+    cursor: pointer;
+    background-color: var(--color-bg-muted);
+    margin-bottom: var(--spacing-lg);
+    transition: background-color var(--transition-fast);
+}
+
+.file-upload-zone:hover {
+    background-color: var(--color-border);
+}
+
+.file-upload-zone i {
+    width: 48px;
+    height: 48px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-sm);
+}
+
+.file-upload-zone p {
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.upload-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.col-full {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    margin-top: var(--spacing-xl);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--spacing-md);
+}

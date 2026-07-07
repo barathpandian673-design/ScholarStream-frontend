@@ -1,0 +1,58 @@
+/* ===================================================================
+   ScholarStream - Footer Styles (Minimalist)
+   =================================================================== */
+
+.footer {
+    background-color: var(--color-bg-surface);
+    border-top: 1px solid var(--color-border);
+    padding: var(--spacing-xl) 0;
+    margin-top: auto;
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    text-align: center;
+}
+
+.footer-logo {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.footer-links {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-link {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    color: var(--color-text-main);
+}
+
+.footer-copy {
+    color: var(--color-text-light);
+    font-size: 0.75rem;
+    margin-top: var(--spacing-sm);
+}
+
+@media (min-width: 768px) {
+    .footer-container {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+    .footer-copy {
+        margin-top: 0;
+    }
+}

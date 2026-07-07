@@ -1,0 +1,116 @@
+/* ===================================================================
+   ScholarStream - Auth Pages (Login/Register) Minimalist
+   =================================================================== */
+
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-height));
+    padding: var(--spacing-xl) var(--spacing-md);
+    background-color: var(--color-bg-muted);
+}
+
+.auth-card {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    width: 100%;
+    max-width: 450px;
+    padding: var(--spacing-xl);
+    flex: 1;
+}
+
+.auth-split {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    max-width: 900px;
+    width: 100%;
+}
+
+.auth-logo-side {
+    text-align: center;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .auth-split {
+        flex-direction: row;
+        gap: 4rem;
+    }
+    .auth-logo-side {
+        display: block;
+        flex: 1;
+    }
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-main);
+}
+
+.auth-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.auth-form .btn {
+    width: 100%;
+    margin-top: var(--spacing-md);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+/* Role Selector in Register */
+.role-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.role-option {
+    flex: 1;
+    text-align: center;
+}
+
+.role-option input[type="radio"] {
+    display: none;
+}
+
+.role-option label {
+    display: block;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.role-option input[type="radio"]:checked + label {
+    border-color: var(--color-text-main);
+    color: var(--color-text-main);
+    background-color: var(--color-bg-muted);
+}
+
+.role-desc {
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+    margin-top: var(--spacing-xs);
+    text-align: center;
+}
