@@ -79,8 +79,8 @@
                 <div class="sidebar-header">
                     <h3>Filter by Subject</h3>
                 </div>
-                <div class="filter-list" id="category-filter-list">
-                    <button class="filter-item active" data-category="all">All Subjects</button>
+                <div class="filter-chips" id="category-filter-list" style="justify-content: flex-start;">
+                    <button class="filter-chip active" data-category="all">All Subjects</button>
                     <!-- Categories loaded dynamically -->
                     <div class="spinner-wrapper flex-center mt-3" id="categories-spinner">
                         <div class="spinner spinner-sm" style="width: 24px; height: 24px; border-width: 2px;"></div>
@@ -165,7 +165,7 @@
 
                 categories.forEach(cat => {
                     const btn = document.createElement('button');
-                    btn.className = 'filter-item';
+                    btn.className = 'filter-chip';
                     btn.dataset.category = cat.id;
                     btn.textContent = cat.name;
                     
@@ -307,7 +307,7 @@
         }
 
         function setActiveFilter(targetBtn) {
-            const items = document.querySelectorAll('.filter-item');
+            const items = document.querySelectorAll('.filter-chip');
             items.forEach(item => item.classList.remove('active'));
             targetBtn.classList.add('active');
         }
