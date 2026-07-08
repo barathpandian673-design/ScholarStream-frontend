@@ -20,16 +20,21 @@
     <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
+    <!-- Static Navigation Header -->
+    <nav class="navbar" id="navbar">
+        <div class="container navbar-container" style="justify-content: center;">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-accent">Scholar</span>Stream
+            </a>
+        </div>
+    </nav>
+
     <!-- Main Content Area -->
-    <main class="auth-main flex-center" style="padding-top: 0; min-height: 100vh; background-color: var(--color-bg-muted); padding: var(--spacing-md);">
-        <div class="card auth-card" style="max-width: 450px; width: 100%; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-            <div class="auth-header" style="text-align: center;">
-                <div style="margin-bottom: 1.5rem;">
-                    <a href="index.html" style="font-size: 1.5rem; font-weight: 700; text-decoration: none;">
-                        <span style="color: var(--color-text-main);">Scholar</span><span style="color: var(--color-text-muted);">Stream</span>
-                    </a>
-                </div>
-                <h2>Welcome Back</h2>
+    <main class="auth-main flex-center">
+        <div class="container auth-container auth-split">
+            <div class="card auth-card">
+                <div class="auth-header" style="text-align: center;">
+                    <h2>Welcome Back</h2>
                     <p class="text-muted">Sign in to manage papers, comment or review</p>
                 </div>
                 
@@ -55,8 +60,27 @@
                 <div class="auth-footer text-center mt-4">
                     <p class="text-muted">Don't have an account? <a href="register.html">Sign up today</a></p>
                 </div>
+            </div>
+            
+            <div class="auth-logo-side hidden-mobile">
+                <img src="images/logo.png" alt="ScholarStream Logo" style="width: 250px; height: auto; border-radius: 50%;">
+                <h3 style="margin-top: 1.5rem; font-size: 1.5rem; color: var(--color-text-main);">ScholarStream</h3>
+                <p style="color: var(--color-text-muted);">The open-access research repository</p>
+            </div>
         </div>
     </main>
+
+    <!-- Static Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-logo">
+                <span class="brand-accent">Scholar</span>Stream
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 ScholarStream. All rights reserved.
+            </div>
+        </div>
+    </footer>
 
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
