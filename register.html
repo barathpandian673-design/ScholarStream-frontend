@@ -2,7 +2,160 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" co<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — ScholarStream</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Stylesheets -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    
+    <!-- Page Specific Stylesheet -->
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <!-- Main Content Area -->
+    <main class="auth-main flex-center" style="padding-top: 0; min-height: 100vh; background-color: var(--color-bg-muted); padding: var(--spacing-md);">
+        <div class="card auth-card" style="max-width: 450px; width: 100%; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <div class="auth-header" style="text-align: center;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="index.html" style="font-size: 1.5rem; font-weight: 700; text-decoration: none;">
+                        <span style="color: var(--color-text-main);">Scholar</span><span style="color: var(--color-text-muted);">Stream</span>
+                    </a>
+                </div>
+                <h2>Join ScholarStream</h2>
+                    <p class="text-muted">Register to search, submit, review or comment</p>
+                </div>
+                
+                <form id="register-form">
+                    <div id="error-container" class="alert alert-error hidden"></div>
+                    
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" class="form-input" required placeholder="e.g. jane_doe">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" id="fullName" class="form-input" required placeholder="e.g. Jane Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-input" required placeholder="e.g. jane@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" class="form-input" required placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role" class="form-label">Account Type (Role)</label>
+                        <select id="role" class="form-select">
+                            <option value="USER">Reader / Discuss (USER)</option>
+                            <option value="AUTHOR">Author / Submitter (AUTHOR)</option>
+                            <option value="REVIEWER">Reviewer / Approver (REVIEWER)</option>
+                            <option value="ADMIN">Administrator (ADMIN)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block mt-4" id="btn-submit">
+                        <span>Create Account</span>
+                        <div class="spinner spinner-sm hidden" id="register-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+                    </button>
+                </form>
+                
+                <div class="auth-footer text-center mt-4">
+                    <p class="text-muted">Already have an account? <a href="login.html">Sign in</a></p>
+                </div>
+        </div>
+    </main>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Unified API JS Module -->
+    <script src="js/api.js"></script>
+    
+    <!-- Page Specific Inline Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            guard.redirectIfLoggedIn();
+            initRegisterForm();
+        });
+
+        function initRegisterForm() {
+            const form = document.getElementById('register-form');
+            const errorContainer = document.getElementById('error-container');
+            const btnSubmit = document.getElementById('btn-submit');
+            const spinner = document.getElementById('register-spinner');
+
+            if (!form) return;
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value.trim();
+                const fullName = document.getElementById('fullName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const role = document.getElementById('role').value;
+
+                // Reset error state
+                errorContainer.classList.add('hidden');
+                errorContainer.textContent = '';
+
+                // Basic validations
+                if (password.length < 6) {
+                    errorContainer.textContent = 'Password must be at least 6 characters long.';
+                    errorContainer.classList.remove('hidden');
+                    return;
+                }
+
+                // Show spinner & disable button
+                btnSubmit.disabled = true;
+                spinner.classList.remove('hidden');
+
+                try {
+                    const data = await api.registerUser({
+                        username,
+                        fullName,
+                        email,
+                        password,
+                        role
+                    });
+
+                    utils.showToast(data.message || 'Registration successful! Please login.', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+
+                } catch (err) {
+                    console.error('Registration form error:', err);
+                    errorContainer.textContent = err.message || 'Registration failed. Try a different username or email.';
+                    errorContainer.classList.remove('hidden');
+                    btnSubmit.disabled = false;
+                    spinner.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
+ntent="width=device-width, initial-scale=1.0">
     <title>Register — ScholarStream</title>
     
     <!-- Google Fonts -->
